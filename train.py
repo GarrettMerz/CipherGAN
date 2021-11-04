@@ -9,27 +9,27 @@ from .metrics.registry import get_metrics
 from .train_utils.lr_schemes import get_lr
 from .train_utils.vocab_utils import read_vocab
 
-tf.flags.DEFINE_string("model", "cycle_gan", "Which model to use.")
-tf.flags.DEFINE_string("data", "cipher", "Which data to use.")
-tf.flags.DEFINE_string("hparam_sets", "cipher_default", "Which hparams to use.")
-tf.flags.DEFINE_string("hparams", "", "Run-specific hparam settings to use.")
-tf.flags.DEFINE_string("metrics", "xy_mse",
+tf.compat.v1.flags.DEFINE_string("model", "cycle_gan", "Which model to use.")
+tf.compat.v1.flags.DEFINE_string("data", "cipher", "Which data to use.")
+tf.compat.v1.flags.DEFINE_string("hparam_sets", "cipher_default", "Which hparams to use.")
+tf.compat.v1.flags.DEFINE_string("hparams", "", "Run-specific hparam settings to use.")
+tf.compat.v1.flags.DEFINE_string("metrics", "xy_mse",
                        "Dash separated list of metrics to use.")
-tf.flags.DEFINE_string("output_dir", "tmp/tf_run",
+tf.compat.v1.flags.DEFINE_string("output_dir", "tmp/tf_run",
                        "The output directory.")
-tf.flags.DEFINE_string("data_dir", "tmp/data", "The data directory.")
-tf.flags.DEFINE_integer("train_steps", 1e4,
+tf.compat.v1.flags.DEFINE_string("data_dir", "tmp/data", "The data directory.")
+tf.compat.v1.flags.DEFINE_integer("train_steps", 1e4,
                         "Number of training steps to perform.")
-tf.flags.DEFINE_integer("eval_steps", 1e2,
+tf.compat.v1.flags.DEFINE_integer("eval_steps", 1e2,
                         "Number of evaluation steps to perform.")
-tf.flags.DEFINE_boolean("overwrite_output", False,
+tf.compat.v1.flags.DEFINE_boolean("overwrite_output", False,
                         "Remove output_dir before running.")
-tf.flags.DEFINE_string("train_name", "data-train*",
+tf.compat.v1.flags.DEFINE_string("train_name", "data-train*",
                        "The train dataset file name.")
-tf.flags.DEFINE_string("test_name", "data-eval*", "The test dataset file name.")
+tf.compat.v1.flags.DEFINE_string("test_name", "data-eval*", "The test dataset file name.")
 
-FLAGS = tf.app.flags.FLAGS
-tf.logging.set_verbosity(tf.logging.INFO)
+FLAGS = tf.compat.v1.app.flags.FLAGS
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
 
 def _run_locally(train_steps, eval_steps):
@@ -65,13 +65,13 @@ def _run_locally(train_steps, eval_steps):
   train_input_fn = _INPUT_FNS[FLAGS.data](train_path, hparams, training=True)
   eval_input_fn = _INPUT_FNS[FLAGS.data](eval_path, hparams, training=False)
 
-  run_config = tf.contrib.learn.RunConfig()
+  run_config = tf.compat.v1.contrib.learn.RunConfig()
 
-  estimator = tf.contrib.learn.Estimator(
+  estimator = tf.compat.v1.contrib.learn.Estimator(
       model_fn=model_fn, model_dir=output_dir, config=run_config)
 
   eval_metrics = get_metrics(FLAGS.metrics, hparams)
-  experiment = tf.contrib.learn.Experiment(
+  experiment = tf.compat.v1.contrib.learn.Experiment(
       estimator=estimator,
       train_input_fn=train_input_fn,
       eval_input_fn=eval_input_fn,
@@ -86,4 +86,4 @@ def main(_):
 
 
 if __name__ == "__main__":
-  tf.app.run()
+  tf.compat.v1.app.run()

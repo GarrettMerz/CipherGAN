@@ -5,13 +5,13 @@ import re
 import numpy as np
 import tensorflow as tf
 
-FLAGS = tf.app.flags.FLAGS
+FLAGS = tf.compat.v1.app.flags.FLAGS
 
 
 def read_vocab(filename):
   vocab = dict()
   filepath = os.path.join(FLAGS.data_dir, filename)
-  with tf.gfile.FastGFile(filepath) as vocab_file:
+  with tf.compat.v1.gfile.FastGFile(filepath) as vocab_file:
     for line in vocab_file:
       match = re.search(r'(\d+)\. (.*)\s*', line)
       vocab[int(match.group(1))] = match.group(2)

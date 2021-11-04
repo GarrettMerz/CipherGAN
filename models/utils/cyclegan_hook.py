@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 
-class CycleGANHook(tf.train.SessionRunHook):
+class CycleGANHook(tf.compat.v1.train.SessionRunHook):
 
   def __init__(self, fetches, placeholders, params):
     super(CycleGANHook, self).__init__()
@@ -49,4 +49,4 @@ class CycleGANHook(tf.train.SessionRunHook):
         self.placeholders["X"]: np.array(self.past_Xs),
         self.placeholders["Y"]: np.array(self.past_Ys)
     }
-    return tf.train.SessionRunArgs(self.fetches, feed_dict)
+    return tf.compat.v1.train.SessionRunArgs(self.fetches, feed_dict)

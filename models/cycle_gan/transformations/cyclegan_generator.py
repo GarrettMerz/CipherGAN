@@ -7,12 +7,12 @@ from ...utils.layers import *
 # modified from https://github.com/hardikbansal/CycleGAN/blob/master/models.py
 @register("cyclegan_generator")
 def build_generator_resnet_9blocks(x, g_params, m_params):
-  with tf.variable_scope(g_params.network_name):
+  with tf.compat.v1.variable_scope(g_params.network_name):
     filtersize = 3
     img_layer = m_params.input_shape[2]
     batch_size = 1
     num_generator_filter = 32
-    pad_input = tf.pad(x, [[0, 0], [filtersize, filtersize],
+    pad_input = tf.compat.v1.pad(x, [[0, 0], [filtersize, filtersize],
                            [filtersize, filtersize], [0, 0]], "REFLECT")
     o_c1 = general_conv2d(
         x=pad_input,
@@ -106,8 +106,8 @@ def build_generator_resnet_9blocks(x, g_params, m_params):
         do_relu=False)
 
     # Adding the tanh layer
-    out_gen = tf.nn.tanh(o_c6)
+    out_gen = tf.compat.v1.nn.tanh(o_c6)
     if (m_params.type == "audio_timbre"):
-      out_gen = tf.slice(out_gen, [0, 0, 0, 0], [-1, -1, 251, -1])
+      out_gen = tf.compat.v1.slice(out_gen, [0, 0, 0, 0], [-1, -1, 251, -1])
 
     return out_gen

@@ -22,15 +22,15 @@ def get_cycle_gan(params, lr):
   def cycle_gan_text(F, G, discrim_X, discrim_Y, X, Y, X_groundtruth,
                      Y_groundtruth, past_Xs, past_Ys, mode):
     """Run CycleGAN on text."""
-    X_dist = tf.one_hot(X, depth=params.vocab_size)
-    Y_dist = tf.one_hot(Y, depth=params.vocab_size)
-    X_groundtruth_dist = tf.one_hot(X_groundtruth, depth=params.vocab_size)
-    Y_groundtruth_dist = tf.one_hot(Y_groundtruth, depth=params.vocab_size)
+    X_dist = tf.compat.v1.one_hot(X, depth=params.vocab_size)
+    Y_dist = tf.compat.v1.one_hot(Y, depth=params.vocab_size)
+    X_groundtruth_dist = tf.compat.v1.one_hot(X_groundtruth, depth=params.vocab_size)
+    Y_groundtruth_dist = tf.compat.v1.one_hot(Y_groundtruth, depth=params.vocab_size)
 
-    X_mask = tf.where(tf.equal(X, 0), tf.zeros_like(X), tf.ones_like(X))
-    X_mask = tf.tile(tf.expand_dims(X_mask, -1), [1, 1, params.vocab_size])
-    Y_mask = tf.where(tf.equal(Y, 0), tf.zeros_like(Y), tf.ones_like(Y))
-    Y_mask = tf.tile(tf.expand_dims(Y_mask, -1), [1, 1, params.vocab_size])
+    X_mask = tf.compat.v1.where(tf.compat.v1.equal(X, 0), tf.compat.v1.zeros_like(X), tf.compat.v1.ones_like(X))
+    X_mask = tf.compat.v1.tile(tf.compat.v1.expand_dims(X_mask, -1), [1, 1, params.vocab_size])
+    Y_mask = tf.compat.v1.where(tf.compat.v1.equal(Y, 0), tf.compat.v1.zeros_like(Y), tf.compat.v1.ones_like(Y))
+    Y_mask = tf.compat.v1.tile(tf.compat.v1.expand_dims(Y_mask, -1), [1, 1, params.vocab_size])
 
     if params.use_embeddings:
       X = embed_inputs(X, params)
@@ -39,7 +39,7 @@ def get_cycle_gan(params, lr):
       X = X_dist
       Y = Y_dist
 
-    with tf.variable_scope("transforms") as scope:
+    with tf.compat.v1.variable_scope("transforms") as scope:
       Y_hat, generator_F_weights = collect_vars(lambda: F(X, params.F, params))
       X_hat, generator_G_weights = collect_vars(lambda: G(Y, params.G, params))
 
@@ -56,49 +56,49 @@ def get_cycle_gan(params, lr):
 
       # Ground truth loss logging. A metric for performance
       # ======================================================================
-      X_groundtruth_loss = tf.reduce_mean(
-          tf.abs(X_hat - X_groundtruth_dist) * tf.to_float(Y_mask))
-      Y_groundtruth_loss = tf.reduce_mean(
-          tf.abs(Y_hat - Y_groundtruth_dist) * tf.to_float(X_mask))
+      X_groundtruth_loss = tf.compat.v1.reduce_mean(
+          tf.compat.v1.abs(X_hat - X_groundtruth_dist) * tf.compat.v1.to_float(Y_mask))
+      Y_groundtruth_loss = tf.compat.v1.reduce_mean(
+          tf.compat.v1.abs(Y_hat - Y_groundtruth_dist) * tf.compat.v1.to_float(X_mask))
       X_groundtruth_acc = groundtruth_accuracy(
-          tf.argmax(X_hat, axis=-1), X_groundtruth, Y_mask[:, :, 0])
+          tf.compat.v1.argmax(X_hat, axis=-1), X_groundtruth, Y_mask[:, :, 0])
       Y_groundtruth_acc = groundtruth_accuracy(
-          tf.argmax(
+          tf.compat.v1.argmax(
               Y_hat, axis=-1), Y_groundtruth, X_mask[:, :, 0])
-      tf.summary.scalar("X_groundtruth_loss", X_groundtruth_loss)
-      tf.summary.scalar("Y_groundtruth_loss", Y_groundtruth_loss)
-      tf.summary.scalar("X_groundtruth_acc", X_groundtruth_acc)
-      tf.summary.scalar("Y_groundtruth_acc", Y_groundtruth_acc)
+      tf.compat.v1.summary.scalar("X_groundtruth_loss", X_groundtruth_loss)
+      tf.compat.v1.summary.scalar("Y_groundtruth_loss", Y_groundtruth_loss)
+      tf.compat.v1.summary.scalar("X_groundtruth_acc", X_groundtruth_acc)
+      tf.compat.v1.summary.scalar("Y_groundtruth_acc", Y_groundtruth_acc)
       # ======================================================================
       # Inspect mappings of the batch sequences.
       # ======================================================================
       lookup_table = construct_vocab_lookup_table(params.vocab)
-      X_text = lookup_table.lookup(tf.argmax(X_dist[:3, :10, :], axis=-1))
-      Y_text = lookup_table.lookup(tf.argmax(Y_dist[:3, :10, :], axis=-1))
-      X_hat_text = lookup_table.lookup(tf.argmax(X_hat[:3, :10, :], axis=-1))
-      Y_hat_text = lookup_table.lookup(tf.argmax(Y_hat[:3, :10, :], axis=-1))
+      X_text = lookup_table.lookup(tf.compat.v1.argmax(X_dist[:3, :10, :], axis=-1))
+      Y_text = lookup_table.lookup(tf.compat.v1.argmax(Y_dist[:3, :10, :], axis=-1))
+      X_hat_text = lookup_table.lookup(tf.compat.v1.argmax(X_hat[:3, :10, :], axis=-1))
+      Y_hat_text = lookup_table.lookup(tf.compat.v1.argmax(Y_hat[:3, :10, :], axis=-1))
       X_reconstruction_text = lookup_table.lookup(
-          tf.argmax(X_reconstruction[:3, :10, :], axis=-1))
+          tf.compat.v1.argmax(X_reconstruction[:3, :10, :], axis=-1))
       Y_reconstruction_text = lookup_table.lookup(
-          tf.argmax(Y_reconstruction[:3, :10, :], axis=-1))
-      X_out_text = tf.string_join(
+          tf.compat.v1.argmax(Y_reconstruction[:3, :10, :], axis=-1))
+      X_out_text = tf.compat.v1.string_join(
           [X_text, "->", Y_hat_text, "->", X_reconstruction_text])
-      tf.summary.text("X", X_out_text)
-      Y_out_text = tf.string_join(
+      tf.compat.v1.summary.text("X", X_out_text)
+      Y_out_text = tf.compat.v1.string_join(
           [Y_text, "->", X_hat_text, "->", Y_reconstruction_text])
-      tf.summary.text("Y", Y_out_text)
+      tf.compat.v1.summary.text("Y", Y_out_text)
       X_gt_text = lookup_table.lookup(X_groundtruth[:3, :10])
       Y_gt_text = lookup_table.lookup(Y_groundtruth[:3, :10])
-      X_out_text = tf.string_join([X_gt_text, "|", X_hat_text])
-      tf.summary.text("X_gt/X_actual", X_out_text)
-      Y_out_text = tf.string_join([Y_gt_text, "|", Y_hat_text])
-      tf.summary.text("Y_gt/Y_actual", Y_out_text)
+      X_out_text = tf.compat.v1.string_join([X_gt_text, "|", X_hat_text])
+      tf.compat.v1.summary.text("X_gt/X_actual", X_out_text)
+      Y_out_text = tf.compat.v1.string_join([Y_gt_text, "|", Y_hat_text])
+      tf.compat.v1.summary.text("Y_gt/Y_actual", Y_out_text)
       # ======================================================================
 
       # Text logging
       #log_text(F, G, params)
 
-    with tf.variable_scope("discriminators") as scope:
+    with tf.compat.v1.variable_scope("discriminators") as scope:
 
       def discrim_loss(X, Y, train_towards_true, do_collect_vars=False):
         """Returns the discriminator loss.
@@ -117,28 +117,28 @@ def get_cycle_gan(params, lr):
             lambda: discrim_Y(Y, params.discriminator_Y, params))
 
         if params.discrim_loss == "full_wgan":
-          X_discrim_loss = -tf.reduce_mean(X_discrim)
-          Y_discrim_loss = -tf.reduce_mean(Y_discrim)
+          X_discrim_loss = -tf.compat.v1.reduce_mean(X_discrim)
+          Y_discrim_loss = -tf.compat.v1.reduce_mean(Y_discrim)
           if train_towards_true:
             X_discrim_loss *= -1
             Y_discrim_loss *= -1
         elif params.discrim_loss == "log":
-          X_discrim_loss = tf.log(X_discrim)
-          Y_discrim_loss = tf.log(Y_discrim)
+          X_discrim_loss = tf.compat.v1.log(X_discrim)
+          Y_discrim_loss = tf.compat.v1.log(Y_discrim)
           if train_towards_true:
             X_discrim_loss *= -1
             Y_discrim_loss *= -1
-          X_discrim_loss = tf.reduce_mean(X_discrim_loss)
-          Y_discrim_loss = tf.reduce_mean(Y_discrim_loss)
+          X_discrim_loss = tf.compat.v1.reduce_mean(X_discrim_loss)
+          Y_discrim_loss = tf.compat.v1.reduce_mean(Y_discrim_loss)
         else:
           if train_towards_true:
-            X_discrim_loss = tf.reduce_mean(
-                tf.squared_difference(X_discrim, 1))
-            Y_discrim_loss = tf.reduce_mean(
-                tf.squared_difference(Y_discrim, 1))
+            X_discrim_loss = tf.compat.v1.reduce_mean(
+                tf.compat.v1.squared_difference(X_discrim, 1))
+            Y_discrim_loss = tf.compat.v1.reduce_mean(
+                tf.compat.v1.squared_difference(Y_discrim, 1))
           else:
-            X_discrim_loss = tf.reduce_mean(X_discrim**2)
-            Y_discrim_loss = tf.reduce_mean(Y_discrim**2)
+            X_discrim_loss = tf.compat.v1.reduce_mean(X_discrim**2)
+            Y_discrim_loss = tf.compat.v1.reduce_mean(Y_discrim**2)
 
         if do_collect_vars:
           return X_discrim_loss, Y_discrim_loss, discrim_X_vars, discrim_Y_vars
@@ -156,7 +156,7 @@ def get_cycle_gan(params, lr):
       X_true_discrim_loss, Y_true_discrim_loss = discrim_loss(X, Y, True)
 
       # We only discriminate on the past example pool if we're training
-      if mode == tf.contrib.learn.ModeKeys.TRAIN:
+      if mode == tf.compat.v1.contrib.learn.ModeKeys.TRAIN:
         if params.use_embeddings:
           past_X_emb = softmax_to_embedding(past_Xs, params)
           past_Y_emb = softmax_to_embedding(past_Ys, params)
@@ -174,8 +174,8 @@ def get_cycle_gan(params, lr):
                                              params.discriminator_X)
         Y_wass_penalty = wasserstein_penalty(discrim_Y, Y_dist, Y_hat, params,
                                              params.discriminator_Y)
-        tf.summary.scalar("X_wass_penalty", X_wass_penalty)
-        tf.summary.scalar("Y_wass_penalty", Y_wass_penalty)
+        tf.compat.v1.summary.scalar("X_wass_penalty", X_wass_penalty)
+        tf.compat.v1.summary.scalar("Y_wass_penalty", Y_wass_penalty)
 
     if params.lp_distance == "l0.5":
       X_reconstr_err = (X_dist - X_reconstruction)**0.5
@@ -184,17 +184,17 @@ def get_cycle_gan(params, lr):
       X_reconstr_err = (X_dist - X_reconstruction)**2
       Y_reconstr_err = (Y_dist - Y_reconstruction)**2
     elif params.lp_distance == "l1":
-      X_reconstr_err = tf.abs(X_dist - X_reconstruction)
-      Y_reconstr_err = tf.abs(Y_dist - Y_reconstruction)
+      X_reconstr_err = tf.compat.v1.abs(X_dist - X_reconstruction)
+      Y_reconstr_err = tf.compat.v1.abs(Y_dist - Y_reconstruction)
 
-    X_mask_counts = tf.reduce_sum(tf.reduce_prod(X_mask, axis=2), axis=1)
-    Y_mask_counts = tf.reduce_sum(tf.reduce_prod(Y_mask, axis=2), axis=1)
+    X_mask_counts = tf.compat.v1.reduce_sum(tf.compat.v1.reduce_prod(X_mask, axis=2), axis=1)
+    Y_mask_counts = tf.compat.v1.reduce_sum(tf.compat.v1.reduce_prod(Y_mask, axis=2), axis=1)
 
-    X_reconstr_err = tf.reduce_sum(X_reconstr_err, axis=2)
-    Y_reconstr_err = tf.reduce_sum(Y_reconstr_err, axis=2)
+    X_reconstr_err = tf.compat.v1.reduce_sum(X_reconstr_err, axis=2)
+    Y_reconstr_err = tf.compat.v1.reduce_sum(Y_reconstr_err, axis=2)
 
-    X_reconstr_err = tf.reduce_mean(X_reconstr_err)
-    Y_reconstr_err = tf.reduce_mean(Y_reconstr_err)
+    X_reconstr_err = tf.compat.v1.reduce_mean(X_reconstr_err)
+    Y_reconstr_err = tf.compat.v1.reduce_mean(Y_reconstr_err)
 
     cycle_loss = X_reconstr_err + Y_reconstr_err
 
@@ -211,40 +211,40 @@ def get_cycle_gan(params, lr):
 
     if params.use_embeddings:
       embedding_loss = discriminator_loss_X + discriminator_loss_Y + params.cycle_loss * cycle_loss
-      tf.summary.scalar("embedding_loss", embedding_loss)
+      tf.compat.v1.summary.scalar("embedding_loss", embedding_loss)
 
-    tf.summary.scalar("X_reconstr_err", X_reconstr_err)
-    tf.summary.scalar("Y_reconstr_err", Y_reconstr_err)
-    tf.summary.scalar("generator_loss_X", generator_loss_X)
-    tf.summary.scalar("generator_loss_Y", generator_loss_Y)
-    tf.summary.scalar("discriminator_loss_X", discriminator_loss_X)
-    tf.summary.scalar("discriminator_loss_Y", discriminator_loss_Y)
-    tf.summary.scalar("lr", lr)
-    tf.summary.scalar("cycle_loss", params.cycle_loss)
+    tf.compat.v1.summary.scalar("X_reconstr_err", X_reconstr_err)
+    tf.compat.v1.summary.scalar("Y_reconstr_err", Y_reconstr_err)
+    tf.compat.v1.summary.scalar("generator_loss_X", generator_loss_X)
+    tf.compat.v1.summary.scalar("generator_loss_Y", generator_loss_Y)
+    tf.compat.v1.summary.scalar("discriminator_loss_X", discriminator_loss_X)
+    tf.compat.v1.summary.scalar("discriminator_loss_Y", discriminator_loss_Y)
+    tf.compat.v1.summary.scalar("lr", lr)
+    tf.compat.v1.summary.scalar("cycle_loss", params.cycle_loss)
 
-    gs = tf.contrib.framework.get_global_step()
+    gs = tf.compat.v1.contrib.framework.get_global_step()
     if params.optimizer == "adagrad":
-      optimizer = tf.train.AdagradOptimizer(lr)
+      optimizer = tf.compat.v1.train.AdagradOptimizer(lr)
     elif params.optimizer == "adam":
-      optimizer = tf.train.AdamOptimizer(
+      optimizer = tf.compat.v1.train.AdamOptimizer(
           lr, beta1=params.beta1, beta2=params.beta2)
     elif params.optimizer == "rsmprop":
-      optimizer = tf.train.RMSPropOptimizer(lr, momentum=params.momentum)
+      optimizer = tf.compat.v1.train.RMSPropOptimizer(lr, momentum=params.momentum)
     elif params.optimizer == "adadelta":
-      optimizer = tf.train.AdadeltaOptimizer(lr)
+      optimizer = tf.compat.v1.train.AdadeltaOptimizer(lr)
     elif params.optimizer == "mom":
-      optimizer = tf.train.MomentumOptimizer(lr, momentum=params.momentum)
+      optimizer = tf.compat.v1.train.MomentumOptimizer(lr, momentum=params.momentum)
 
     aux_weights = [get_embedding_var(
         params, reuse=True)] if params.use_embeddings else []
 
-    for weight in tf.trainable_variables():
+    for weight in tf.compat.v1.trainable_variables():
       print(weight.name)
 
     if params.use_embeddings:
       train_emb = optimizer.minimize(embedding_loss, var_list=aux_weights)
     else:
-      train_emb = tf.no_op()
+      train_emb = tf.compat.v1.no_op()
     train_gX = optimizer.minimize(
         generator_loss_X, var_list=generator_G_weights)
     train_gY = optimizer.minimize(
@@ -255,13 +255,13 @@ def get_cycle_gan(params, lr):
         discriminator_loss_Y, var_list=discrim_Y_weights)
 
     if params.d_step == 1:
-      train_op = tf.group(train_emb, train_gX, train_gY, train_dX, train_dY,
-                          tf.assign_add(gs, 1))
+      train_op = tf.compat.v1.group(train_emb, train_gX, train_gY, train_dX, train_dY,
+                          tf.compat.v1.assign_add(gs, 1))
     else:
-      train_op = tf.cond(
-          tf.equal(tf.mod(gs, (params.d_step + 1)), 1),
-          lambda: tf.group(train_gX, train_gY, tf.assign_add(gs, 1)),
-          lambda: tf.group(train_dX, train_dY, tf.assign_add(gs, 1)))
+      train_op = tf.compat.v1.cond(
+          tf.compat.v1.equal(tf.compat.v1.mod(gs, (params.d_step + 1)), 1),
+          lambda: tf.compat.v1.group(train_gX, train_gY, tf.compat.v1.assign_add(gs, 1)),
+          lambda: tf.compat.v1.group(train_dX, train_dY, tf.compat.v1.assign_add(gs, 1)))
 
     return X_hat, Y_hat, total_loss, train_op
 
@@ -272,7 +272,7 @@ def get_cycle_gan(params, lr):
       features: a dict containing key "X" and key "Y"
       mode: training, evaluation or infer
     """
-    with tf.variable_scope("cycle_gan"):
+    with tf.compat.v1.variable_scope("cycle_gan"):
       # gather transformations and descriminators
       F = _TRANSFORMATIONS[params.F.name]
       G = _TRANSFORMATIONS[params.G.name]
@@ -282,8 +282,8 @@ def get_cycle_gan(params, lr):
       X = features["X"]
       Y = features["Y"]
 
-      past_Xs = tf.placeholder(tf.float32, [None] + params.input_shape)
-      past_Ys = tf.placeholder(tf.float32, [None] + params.input_shape)
+      past_Xs = tf.compat.v1.placeholder(tf.compat.v1.float32, [None] + params.input_shape)
+      past_Ys = tf.compat.v1.placeholder(tf.compat.v1.float32, [None] + params.input_shape)
 
       if params.type == "text":
         X_ground_truth = features["X_ground_truth"]
@@ -300,7 +300,7 @@ def get_cycle_gan(params, lr):
       }, {"X": past_Xs,
           "Y": past_Ys}, params)
 
-      return tf.contrib.learn.ModelFnOps(
+      return tf.compat.v1.contrib.learn.ModelFnOps(
           mode=mode,
           predictions={"X": X_hat,
                        "Y": Y_hat},

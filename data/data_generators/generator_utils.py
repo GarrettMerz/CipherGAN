@@ -10,14 +10,14 @@ def to_example(dictionary):
     if len(v) == 0:
       raise Exception("Empty field: %s" % str((k, v)))
     if isinstance(v[0], (int, np.int8, np.int32, np.int64)):
-      features[k] = tf.train.Feature(int64_list=tf.train.Int64List(value=v))
+      features[k] = tf.compat.v1.train.Feature(int64_list=tf.compat.v1.train.Int64List(value=v))
     elif isinstance(v[0], (float, np.float32)):
-      features[k] = tf.train.Feature(float_list=tf.train.FloatList(value=v))
+      features[k] = tf.compat.v1.train.Feature(float_list=tf.compat.v1.train.FloatList(value=v))
     elif isinstance(v[0], (str, bytes)):
-      features[k] = tf.train.Feature(bytes_list=tf.train.BytesList(value=v))
+      features[k] = tf.compat.v1.train.Feature(bytes_list=tf.compat.v1.train.BytesList(value=v))
     else:
       raise Exception("Unsupported type: %s" % type(v[0]))
-  return tf.train.Example(features=tf.train.Features(feature=features))
+  return tf.compat.v1.train.Example(features=tf.compat.v1.train.Features(feature=features))
 
 
 def generate_files(generator,
@@ -32,12 +32,12 @@ def generate_files(generator,
   for shard in range(num_shards):
     output_filename = "%s-%dof%d" % (output_name, shard + 1, num_shards)
     output_file = os.path.join(output_dir, output_filename)
-    writers.append(tf.python_io.TFRecordWriter(output_file))
+    writers.append(tf.compat.v1.python_io.TFRecordWriter(output_file))
 
   counter, shard = 0, 0
   for case in generator:
     if counter % 100 == 0:
-      tf.logging.info("Processed %d examples..." % counter)
+      tf.compat.v1.logging.info("Processed %d examples..." % counter)
     counter += 1
     if max_cases and counter > max_cases:
       break

@@ -19,9 +19,9 @@ def get_init(params):
 
 @register("random")
 def constant(params):
-  return tf.random_normal_initializer()
+  return tf.compat.v1.random_normal_initializer()
 
 
 @register("constant")
 def constant(params):
-  return tf.constant_initializer(0.1, tf.int32)
+  return tf.compat.v1.constant_initializer(0.1, tf.compat.v1.int32)

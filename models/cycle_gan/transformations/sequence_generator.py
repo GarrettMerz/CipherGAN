@@ -7,7 +7,7 @@ from ...utils.model_utils import get_embedding_var
 
 @register("simple_generator")
 def sequence_generator(x, g_params, m_params):
-  with tf.variable_scope(g_params.network_name):
+  with tf.compat.v1.variable_scope(g_params.network_name):
     x = general_conv1d(
         x,
         num_filters=g_params.filter_count,
@@ -18,7 +18,7 @@ def sequence_generator(x, g_params, m_params):
         do_relu=True,
         relufactor=0,
         name="c1")
-    x = tf.nn.relu(x + general_conv1d(
+    x = tf.compat.v1.nn.relu(x + general_conv1d(
         x,
         num_filters=g_params.filter_count,
         filter_size=g_params.filter_size,
@@ -40,7 +40,7 @@ def sequence_generator(x, g_params, m_params):
         name="c3")
 
     # Softmax layer defines a probability distribution over output vocabulary
-    output_dist = tf.nn.softmax(x, dim=-1)
+    output_dist = tf.compat.v1.nn.softmax(x, dim=-1)
 
     return output_dist
 
@@ -48,11 +48,11 @@ def sequence_generator(x, g_params, m_params):
 # modified from https://github.com/hardikbansal/CycleGAN/blob/master/models.py
 @register("sequence_generator")
 def sequence_generator(x, g_params, m_params):
-  with tf.variable_scope(g_params.network_name):
+  with tf.compat.v1.variable_scope(g_params.network_name):
     if g_params.add_timing:
       x = timing(x, m_params)
 
-    pad_input = tf.pad(
+    pad_input = tf.compat.v1.pad(
         x, [[0, 0], [g_params.filter_size // 2, g_params.filter_size // 2],
             [0, 0]], "CONSTANT")
     c = general_conv1d(
@@ -98,6 +98,6 @@ def sequence_generator(x, g_params, m_params):
         name="out")
 
     # Softmax layer defines a probability distribution over output vocabulary
-    output_dist = tf.nn.softmax(c, dim=-1)
+    output_dist = tf.compat.v1.nn.softmax(c, dim=-1)
 
     return output_dist

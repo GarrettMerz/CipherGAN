@@ -7,7 +7,7 @@ from .registry import register
 def input_fn(data_sources, params, training):
 
   def _input_fn():
-    x = tf.random_uniform(
+    x = tf.compat.v1.random_uniform(
         [params.batch_size] + params.input_shape, minval=0, maxval=1)
     output = tf.random_uniform(
         [params.batch_size] + params.output_shape, minval=0, maxval=1)

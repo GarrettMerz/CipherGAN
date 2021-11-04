@@ -11,69 +11,69 @@ Note:
     - custom: no padding needed.
     - non-custom: index 0 and index 1 are <pad> and <unk>
 
-See tf.flags defined below for all available options.
+See tf.compat.v1.flags defined below for all available options.
 """
 
 import nltk
 from collections import deque
 from generator_utils import *
 
-tf.flags.DEFINE_string("output_dir", "tmp/dataset/cipher",
+tf.compat.v1.flags.DEFINE_string("output_dir", "tmp/dataset/cipher",
                        "The output directory to write data to.")
-tf.flags.DEFINE_string("train_name", "data-train",
+tf.compat.v1.flags.DEFINE_string("train_name", "data-train",
                        "The filename to store training samples under.")
-tf.flags.DEFINE_string("test_name", "data-eval",
+tf.compat.v1.flags.DEFINE_string("test_name", "data-eval",
                        "The filename to store testing samples under.")
-tf.flags.DEFINE_string("vocab_filename", "vocab.txt",
+tf.compat.v1.flags.DEFINE_string("vocab_filename", "vocab.txt",
                        "The filename to write the vocabulary to.")
-tf.flags.DEFINE_string(
+tf.compat.v1.flags.DEFINE_string(
     "corpus", "custom",
     "Choice of nltk corpus to use. If 'custom' uses vocab defined in plain_vocab. "
     "A full list of available corpii is available at http://www.nltk.org/nltk_data/"
 )
-tf.flags.DEFINE_string("cipher", "shift", "Choice of shift or vigenere")
-tf.flags.DEFINE_bool("separate_domains", False,
+tf.compat.v1.flags.DEFINE_string("cipher", "shift", "Choice of shift or vigenere")
+tf.compat.v1.flags.DEFINE_bool("separate_domains", False,
                      "Whether input and output domains should be separated.")
-tf.flags.DEFINE_float(
+tf.compat.v1.flags.DEFINE_float(
     "percentage_training", .8,
     "What percentage of the corpus should be used for training and the rest for testing"
 )
-tf.flags.DEFINE_integer(
+tf.compat.v1.flags.DEFINE_integer(
     "vocab_size", 1000,
     "The maximum number of vocabulary allowed, words beyond that will be counted as an "
     "unknown value")
-tf.flags.DEFINE_string(
+tf.compat.v1.flags.DEFINE_string(
     "plain_vocab", "0,1,2,3,4,5,6,7,8,9",
     "The characters (comma separated) used for the plaintext vocabulary.")
-tf.flags.DEFINE_string(
+tf.compat.v1.flags.DEFINE_string(
     "cipher_vocab", "10,11,12,13,14,15,16,17,18,19",
     "The characters (comma separated) used for the cipher text vocabulary.")
-tf.flags.DEFINE_string(
+tf.compat.v1.flags.DEFINE_string(
     "distribution", None,
     "The distribution (comma separated) for each character of the vocabularies."
 )
-tf.flags.DEFINE_integer("sample_length", 100,
+tf.compat.v1.flags.DEFINE_integer("sample_length", 100,
                         "The number of characters in each sample.")
-tf.flags.DEFINE_string(
+tf.compat.v1.flags.DEFINE_string(
     "vigenere_key", "34",
     "The key for Vigenere cipher relates to the Vigenere table.")
-tf.flags.DEFINE_bool("char_level", False,
+tf.compat.v1.flags.DEFINE_bool("char_level", False,
                      "Whether the data is to be tokenized character-wise.")
-tf.flags.DEFINE_integer(
+tf.compat.v1.flags.DEFINE_integer(
     "shift_amount", 3,
     "The size of the shift for the shift cipher. -1 means random")
-tf.flags.DEFINE_integer(
+tf.compat.v1.flags.DEFINE_integer(
     "num_train", 50000,
     "The number of training samples to produce for each vocab.")
-tf.flags.DEFINE_integer(
+tf.compat.v1.flags.DEFINE_integer(
     "num_test", 5000, "The number of test samples to produce for each vocab.")
-tf.flags.DEFINE_integer("num_shards", 1,
+tf.compat.v1.flags.DEFINE_integer("num_shards", 1,
                         "The number of files to shard data into.")
-tf.flags.DEFINE_bool("insert_unk", True,
+tf.compat.v1.flags.DEFINE_bool("insert_unk", True,
                      "Insert <unk> if word is unknown due to vocab_size.")
 
-FLAGS = tf.app.flags.FLAGS
-tf.logging.set_verbosity(tf.logging.INFO)
+FLAGS = tf.compat.v1.app.flags.FLAGS
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
 # reserve 0 for pad
 _CROP_AMOUNT = 1

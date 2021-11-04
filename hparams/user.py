@@ -31,13 +31,13 @@ def vigenere():
 
   c.F.add_timing = True
   c.F.filter_size = 1
-  c.G = tf.contrib.training.HParams.from_proto(c.F.to_proto())
+  c.G = tf.compat.v1.contrib.training.HParams.from_proto(c.F.to_proto())
   c.G.network_name = "G"
 
   c.discriminator_X.add_timing = True
   c.discriminator_X.dropout = 0.5
   c.discriminator_X.filter_count = 32
-  c.discriminator_Y = tf.contrib.training.HParams.from_proto(
+  c.discriminator_Y = tf.compat.v1.contrib.training.HParams.from_proto(
     c.discriminator_X.to_proto())
   c.discriminator_Y.network_name = "discriminator_Y"
 

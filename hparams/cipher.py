@@ -23,14 +23,14 @@ def simple_cipher():
   c.F.add_hparam("filter_count", 32)
   c.F.add_hparam("filter_size", 1)
   c.F.add_hparam("add_timing", False)
-  c.G = tf.contrib.training.HParams.from_proto(c.F.to_proto())
+  c.G = tf.compat.v1.contrib.training.HParams.from_proto(c.F.to_proto())
   c.G.network_name = "G"
   c.discriminator_X.name = "sequence_discriminator"
   c.discriminator_X.add_hparam("filter_count", 32)
   c.discriminator_X.add_hparam("filter_size", 15)
   c.discriminator_X.add_hparam("add_timing", False)
   c.discriminator_X.add_hparam("dropout", 0.0)
-  c.discriminator_Y = tf.contrib.training.HParams.from_proto(
+  c.discriminator_Y = tf.compat.v1.contrib.training.HParams.from_proto(
       c.discriminator_X.to_proto())
   c.discriminator_Y.network_name = "discriminator_Y"
 

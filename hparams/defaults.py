@@ -5,7 +5,7 @@ from .registry import register
 
 @register("default")
 def default():
-  return tf.contrib.training.HParams(
+  return tf.compat.v1.contrib.training.HParams(
       type="image",
       batch_size=64,
       learning_rate=0.01,

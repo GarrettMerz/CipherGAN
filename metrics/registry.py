@@ -25,13 +25,13 @@ def get_metrics(metrics, hparams, key=None):
 def get_cross_entropy(hparams, key=None):
 
   def _cross_entropy(predictions, labels, weights=1.0):
-    return tf.losses.softmax_cross_entropy(
+    return tf.compat.v1.losses.softmax_cross_entropy(
         onehot_labels=labels,
         logits=predictions,
         weights=weights,
         label_smoothing=hparams.label_smoothing)
 
-  return tf.contrib.learn.MetricSpec(
+  return tf.compat.v1.contrib.learn.MetricSpec(
       _cross_entropy, prediction_key=key, label_key=key)
 
 
@@ -40,10 +40,10 @@ def get_cross_entropy(hparams, key=None):
 def get_mean_squared_error(hparams, key=None):
 
   def _mean_squared_error(predictions, labels, weights=1.0):
-    return tf.losses.mean_squared_error(
+    return tf.compat.v1.losses.mean_squared_error(
         labels=labels, predictions=predictions, weights=weights)
 
-  return tf.contrib.learn.MetricSpec(
+  return tf.compat.v1.contrib.learn.MetricSpec(
       _mean_squared_error, prediction_key=key, label_key=key)
 
 
@@ -51,19 +51,19 @@ def get_mean_squared_error(hparams, key=None):
 def get_shift_error(hparams, key=None):
 
   def _shift_error(predictions, labels, weights=1.0):
-    predictions = tf.reshape(predictions, [hparams.batch_size, -1])
-    labels = tf.reshape(labels, [hparams.batch_size, -1])
+    predictions = tf.compat.v1.reshape(predictions, [hparams.batch_size, -1])
+    labels = tf.compat.v1.reshape(labels, [hparams.batch_size, -1])
 
-    elements_equal = tf.equal(
-        tf.to_int32(tf.round(predictions)), tf.to_int32(labels))
-    sequence_equal = tf.reduce_all(elements_equal, axis=1)
-    return tf.reduce_mean(tf.to_float(sequence_equal))
+    elements_equal = tf.compat.v1.equal(
+        tf.compat.v1.to_int32(tf.compat.v1.round(predictions)), tf.compat.v1.to_int32(labels))
+    sequence_equal = tf.compat.v1.reduce_all(elements_equal, axis=1)
+    return tf.compat.v1.reduce_mean(tf.compat.v1.to_float(sequence_equal))
 
-  return tf.contrib.learn.MetricSpec(
+  return tf.compat.v1.contrib.learn.MetricSpec(
       _shift_error, prediction_key=key, label_key=key)
 
 
 @register("acc")
 def get_accuracy(hparams, key=None):
-  return tf.contrib.learn.MetricSpec(
-      tf.contrib.metrics.accuracy, prediction_key=key, label_key=key)
+  return tf.compat.v1.contrib.learn.MetricSpec(
+      tf.compat.v1.contrib.metrics.accuracy, prediction_key=key, label_key=key)

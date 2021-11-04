@@ -7,13 +7,13 @@ from .defaults import default
 @register("gan_default")
 def gan_default():
   gan_default = default()
-  F = tf.contrib.training.HParams(name="cyclegan_generator", network_name="F")
-  G = tf.contrib.training.HParams(name="cyclegan_generator", network_name="G")
+  F = tf.compat.v1.contrib.training.HParams(name="cyclegan_generator", network_name="F")
+  G = tf.compat.v1.contrib.training.HParams(name="cyclegan_generator", network_name="G")
   gan_default.add_hparam("F", F)
   gan_default.add_hparam("G", G)
-  discriminator_X = tf.contrib.training.HParams(
+  discriminator_X = tf.compat.v1.contrib.training.HParams(
       name="patch_discriminator", network_name="discriminator_X")
-  discriminator_Y = tf.contrib.training.HParams(
+  discriminator_Y = tf.compat.v1.contrib.training.HParams(
       name="patch_discriminator", network_name="discriminator_Y")
   gan_default.add_hparam("discriminator_X", discriminator_X)
   gan_default.add_hparam("discriminator_Y", discriminator_Y)
